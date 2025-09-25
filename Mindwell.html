@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Wellness Quiz</title>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+      color: #eee;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 700px;
+      width: 90%;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #00ffe7;
+      text-shadow: 0 0 8px #00ffe7;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .question {
+      margin: 20px 0;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.07);
+      box-shadow: 0 0 15px rgba(0,255,231,0.1);
+    }
+
+    button {
+      display: block;
+      width: 100%;
+      background: linear-gradient(90deg, #00ffe7, #008cff);
+      color: #111;
+      border: none;
+      padding: 14px;
+      margin: 10px 0;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-shadow: 0 0 5px #fff;
+    }
+
+    button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 15px #00ffe7;
+    }
+
+    .result {
+      text-align: center;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.4);
+      box-shadow: 0 0 10px rgba(0,255,231,0.2);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .tips {
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 12px;
+      background: rgba(0,255,231,0.05);
+      text-align: left;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- HOME PAGE -->
+    <div id="home" class="page active">
+      <h1>🌌 Welcome to the Mental Wellness Quiz</h1>
+      <p style="text-align:center;">
+        This short quiz will help you understand your current stress or depression levels.<br>
+        At the end, you'll receive personalized tips to improve your mental well-being. 💙
+      </p>
+      <button onclick="goToPage('quiz')">Start Quiz 🚀</button>
+    </div>
+
+    <!-- QUIZ PAGE -->
+    <div id="quiz" class="page">
+      <h1>🧠 Mental Wellness Quiz</h1>
+      <div id="quizContent"></div>
+    </div>
+
+    <!-- RESULT PAGE -->
+    <div id="result" class="page">
+      <h1>📊 Your Result</h1>
+      <div id="resultContent" class="result"></div>
+      <button onclick="goToPage('home')">🏠 Back to Home</button>
+      <button onclick="restartQuiz()">🔄 Retake Quiz</button>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      { 
+        text: "How often do you wake up feeling motivated and ready for the day?", 
+        options: ["Almost every day 🌞", "Sometimes, depends on mood 🌤", "Rarely, I feel drained 😴", "Almost never, mornings are hard 🌑"], 
+        weight: 2 
+      },
+      { 
+        text: "Do you still enjoy your hobbies or spending time with friends?", 
+        options: ["Yes, I enjoy them a lot 🎨", "Sometimes, but not always 🎭", "Rarely, I’ve lost some interest 😕", "Not at all, I avoid them 🚫"], 
+        weight: 2 
+      },
+      { 
+        text: "How often do you feel overwhelmed by stress or constant worrying?", 
+        options: ["Almost never, I handle stress well 💪", "Occasionally, but I cope fine ✨", "Quite often, stress is tough 😟", "Nearly every day, it’s overwhelming 😔"], 
+        weight: 3 
+      },
+      { 
+        text: "How well do you usually sleep at night?", 
+        options: ["Very well, I sleep peacefully 😴", "Sometimes good, sometimes bad 🌙", "Often restless or hard to sleep 😕", "Almost every night I struggle 🛑"], 
+        weight: 2 
+      },
+      { 
+        text: "Do you feel hopeful and confident about your future?", 
+        options: ["Yes, I’m optimistic 🌈", "Sometimes, but I get doubts 🌤", "Rarely, I feel uncertain 😐", "Not at all, I feel hopeless 😔"], 
+        weight: 2 
+      },
+      { 
+        text: "Do you feel supported by friends, family, or people around you?", 
+        options: ["Yes, very supported ❤️", "Somewhat supported 🤝", "Rarely supported 😶", "Not supported at all 💔"], 
+        weight: 2 
+      }
+    ];
+
+    let current = 0;
+    let score = 0;
+
+    const quizContent = document.getElementById("quizContent");
+    const resultContent = document.getElementById("resultContent");
+
+    function goToPage(pageId) {
+      document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+      document.getElementById(pageId).classList.add("active");
+
+      if (pageId === "quiz") startQuiz();
+    }
+
+    function startQuiz() {
+      current = 0;
+      score = 0;
+      showQuestion();
+    }
+
+    function showQuestion() {
+      if (current < questions.length) {
+        const q = questions[current];
+        quizContent.innerHTML = `
+          <div class="question">
+            <h2>Q${current + 1}: ${q.text}</h2>
+            ${q.options.map((opt, idx) => 
+              `<button onclick="answer(${idx})">${opt}</button>`).join("")}
+          </div>
+        `;
+      } else {
+        showResult();
+      }
+    }
+
+    function answer(value) {
+      score += value * questions[current].weight;
+      current++;
+      showQuestion();
+    }
+
+    function showResult() {
+      goToPage("result");
+      let level, tips;
+
+      if (score < 12) {
+        level = "✨ Low Stress / Great Mental State";
+        tips = `
+          - Keep up your healthy habits! 🌱 <br>
+          - Continue exercising, sleeping well & staying social. <br>
+          - Practice gratitude journaling to maintain positivity.`;
+      } else if (score < 20) {
+        level = "⚡ Moderate Stress / Some Struggles";
+        tips = `
+          - Try daily mindfulness or meditation 🧘 <br>
+          - Balance work with relaxation activities 🎶 <br>
+          - Talk to trusted friends or family regularly 💬`;
+      } else {
+        level = "🌑 High Stress / Possible Depression";
+        tips = `
+          - Reach out to a mental health professional 🩺 <br>
+          - Avoid isolation – connect with loved ones ❤️ <br>
+          - Reduce screen time, focus on small daily wins ✅ <br>
+          - You are not alone. Help is available. 🙏`;
+      }
+
+      resultContent.innerHTML = `
+        <h2>${level}</h2>
+        <p><strong>Your Score:</strong> ${score}</p>
+        <div class="tips"><strong>Tips:</strong><br>${tips}</div>
+      `;
+    }
+
+    function restartQuiz() {
+      goToPage("quiz");
+    }
+  </script>
+</body>
+</html>
