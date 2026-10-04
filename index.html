@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A simple password strength checker." />
+  <title>Password Strength Checker</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="card">
+      <div class="header">
+        <div class="icon">🔐</div>
+        <div>
+          <h1>Password Strength Checker</h1>
+          <p>Test your password locally with a simple security score.</p>
+        </div>
+      </div>
+
+      <form id="passwordForm">
+        <label for="password">Enter password</label>
+
+        <div class="input-row">
+          <input
+            id="password"
+            name="password"
+            type="password"
+            autocomplete="off"
+            placeholder="Enter a password..."
+            maxlength="1000"
+            required
+          />
+          <button type="button" id="togglePassword" class="icon-btn" aria-label="Show password">
+            👁️
+          </button>
+        </div>
+
+        <div class="meter">
+          <div id="meterFill" class="meter-fill"></div>
+        </div>
+
+        <div class="result-row">
+          <span>Strength</span>
+          <strong id="strengthLabel">—</strong>
+        </div>
+
+        <button type="submit" class="check-btn">Check Strength</button>
+      </form>
+
+      <section class="results" aria-live="polite">
+        <h2>Password requirements</h2>
+        <div class="requirements">
+          <div class="requirement" id="req-length8"><span>○</span> At least 8 characters</div>
+          <div class="requirement" id="req-length12"><span>○</span> 12+ characters</div>
+          <div class="requirement" id="req-lowercase"><span>○</span> Lowercase letter</div>
+          <div class="requirement" id="req-uppercase"><span>○</span> Uppercase letter</div>
+          <div class="requirement" id="req-number"><span>○</span> Number</div>
+          <div class="requirement" id="req-special"><span>○</span> Special character</div>
+        </div>
+
+        <div id="suggestionsBox" class="suggestions hidden">
+          <h2>Suggestions</h2>
+          <ul id="suggestions"></ul>
+        </div>
+      </section>
+
+      <p class="privacy">🔒 Your password is analyzed in memory and is not stored by this application.</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
